@@ -10,6 +10,46 @@ function App() {
   const [board, setBoard] = useState(createEmptyBoard());
   const [currentPlayer, setCurrentPlayer] = useState("R");
   const [winner, setWinner] = useState("");
+  const [mode, setMode] = useState<"local" | "bot" | null>(null);
+
+  if (!mode) {
+    return (
+      <div className="app">
+        <h1>Connect 4</h1>
+        <button onClick={() => setMode("local")}>Local</button>
+        <button onClick={() => setMode("bot")}>Bot</button>
+      </div>
+    )
+  }
+
+  function botMove(boardState: string[][]) {
+    const openColumns = boardState[0].map((_, colIndex) => colIndex).filter(col => boardState[0][col] === "");
+    if (openColumns.length === 0) {return};
+    const randomColumn = openColumns[Math.floor(Math.random() * openColumns.length)]
+    const newBoard = boardState.map(row => [...row]);
+    let placedRow = -1;
+
+    for (let row = newBoard.length - 1; row >= 0; row--) {
+      if (!newBoard[row][randomColumn]) {
+        newBoard[row][randomColumn] = "Y";
+        placedRow = row;
+        break;
+      }
+    }
+
+    if (placedRow === -1) {
+      return
+    }
+
+    setBoard(newBoard);
+    if (checkWinner(newBoard, placedRow, randomColumn)) {
+      setWinner("Y");
+      return;
+    } else {
+      setCurrentPlayer("R");    
+    }
+  }
+
 
   function changePlayer() {
     setCurrentPlayer(currentPlayer === "Y" ? "R" : "Y");
@@ -60,25 +100,48 @@ function App() {
   }
 
   function handleDrop(col: number) {
+    if (winner) {
+      return
+    }
+
     const newBoard = board.map(row => [...row]);
+    let placedRow = -1;
     for (let row = newBoard.length - 1; row >= 0; row--) {
       if (!newBoard[row][col]) {
         newBoard[row][col] = currentPlayer;
-        setBoard(newBoard);
-        if (checkWinner(newBoard, row, col)) {
-          setWinner(currentPlayer);
-        } else {
-          changePlayer();
-        }
+        placedRow = row;
         break;
       }
     }
+    if (placedRow === -1) {
+      return
+    }
+
+    setBoard(newBoard)
+    if (checkWinner(newBoard, placedRow, col)) {
+      setWinner(currentPlayer);
+      return;
+    }
+
+    const nextPlayer = currentPlayer === "Y" ? "R": "Y";
+    setCurrentPlayer(nextPlayer);
+
+    if (mode === "bot" && nextPlayer === "Y") {
+      setTimeout(() => botMove(newBoard), 500)
+    }
+  }
+
+  function resetGame() {
+    setBoard(createEmptyBoard())
+    setCurrentPlayer("R")
+    setWinner("")
   }
 
   return (
     <div className="app">
       <h1>Connect 4</h1>
       {winner && <h2>Winner: {winner}</h2>}
+      <button onClick={resetGame}>Reset</button>
       <Board board={board} winner={winner} onDrop={handleDrop} />
     </div>
   );
