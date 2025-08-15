@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import Board from "./components/Board";
+import "./App.css"
 
 function createEmptyBoard(): string[][] {
   return Array.from({ length: 6 }, () => Array(7).fill(""));
@@ -73,28 +75,13 @@ function App() {
     }
   }
 
-return (
-  <div>
-    <h1>Connect 4</h1>
-    {winner && <h2>Winner: {winner}</h2>}
-
-    <div className="board">
-      {board.map((row, rowIndex) => (
-        <div key={rowIndex} className="row">
-          {row.map((cell, colIndex) => (
-            <div
-              key={colIndex}
-              className={`cell ${cell}`}
-              onClick={() => !winner && handleDrop(colIndex)}
-            >
-              {cell && <div className={`disc ${cell}`} />}
-            </div>
-          ))}
-        </div>
-      ))}
+  return (
+    <div className="app">
+      <h1>Connect 4</h1>
+      {winner && <h2>Winner: {winner}</h2>}
+      <Board board={board} winner={winner} onDrop={handleDrop} />
     </div>
-  </div>
-);
+  );
 }
 
 export default App;

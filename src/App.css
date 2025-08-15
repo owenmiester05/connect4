@@ -1,0 +1,10 @@
+.app {
+  display: flex;
+  flex-direction: column;      /* stack title, winner, board vertically */
+  align-items: center;         /* center horizontally */
+  justify-content: center;     /* optional: center vertically */
+  min-height: 100vh;           /* make container full viewport height */
+  background-color: #f0f4f8;   /* light background */
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
